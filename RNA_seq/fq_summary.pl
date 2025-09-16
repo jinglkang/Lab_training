@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-my @txts=<fastqc1/*fastqc/summary.txt>;
+my @txts=<$ARGV[0]/*fastqc/summary.txt>;
 my %hash;
 foreach my $txt (@txts) {
 	open TXT, $txt or die "can not open $txt\n";
