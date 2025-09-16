@@ -89,10 +89,46 @@ cd Trimmomatic-0.39;ls
 # yfchen@hnu2024 Tue Sep 16 10:59:11 ~/RNA_seq
 mkdir fastqc1
 # 运行；必须了解每一个参数代表什么意思
-fastqc *.gz -o ./fastqc --extract -t 20
+fastqc *.gz -o ./fastqc1 --extract -t 20
 # 运行时间过长的时候，可以用nohup提交至后台，就可以继续做其他的事情了
-nohup fastqc *.gz -o ./fastqc --extract -t 20 > fastqc1.process 2>&1 &
+nohup fastqc *.gz -o ./fastqc1 --extract -t 20 > fastqc1.process 2>&1 &
 top # top命令查看
 # 如果不用nohup，也可以重新开一个窗口，这样也可以继续做其他的事情了
 # 运行结束之后查看每个结果文件里面的summary.txt，统计里面fail项
+
+# fastqc运行完之后，统计结果中出现各个项目中出现fail的次数
+# yfchen@hnu2024 Tue Sep 16 11:51:43 ~/RNA_seq
+perl fq_summary.pl fastqc1
+```
+
+## 2. Trimmomatic过滤
+```bash
+# yfchen@hnu2024 Tue Sep 16 11:54:54 ~/RNA_seq
+mkdir -p Trimmomatic/paired/
+mkdir -p Trimmomatic/unpaired/
+# copy运行Trimmomatic所需的java程序和adapter文件
+cp ~/software/Trimmomatic-0.39/trimmomatic-0.39.jar ./
+cp ~/software/Trimmomatic-0.39/adapters/TruSeq2-PE.fa ./
+
+# 参考http://www.usadellab.org/cms/?page=trimmomatic，了解每个参数的意思以及如何运行
+# 试运行
+# java -jar trimmomatic-0.39.jar PE input_reverse.fq.gz output_forward_paired.fq.gz output_forward_unpaired.fq.gz output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:True LEADING:3 TRAILING:3 MINLEN:36
+
+java -jar trimmomatic-0.39.jar PE DaruB10_R1.fq.gz DaruB10_R2.fq.gz Trimmomatic/paired/DaruB10_R1.paired.fq.gz Trimmomatic/unpaired/DaruB10_R1.unpaired.fq.gz Trimmomatic/paired/DaruB10_R2.paired.fq.gz Trimmomatic/unpaired/DaruB10_R2.unpaired.fq.gz ILLUMINACLIP:TruSeq2-PE.fa:2:30:10 LEADING:4 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:40 -threads 10
+
+# 一次性运行全部，nohup提交至后台运行，可用top查看
+nohup perl run_trimmo.pl TruSeq2-PE.fa > run_trimmo.process 2>&1 &
+```
+
+## 3. fastqc对过滤后的数据进行质量检测
+```bash
+# Trimmomatic运行完之后
+# yfchen@hnu2024 Tue Sep 16 13:48:13 ~/RNA_seq
+mkdir fastqc2
+nohup fastqc Trimmomatic/paired/*.gz -o ./fastqc2 --extract -t 20 > fastqc2.process 2>&1 &
+
+# 根据比较Trimmomatic过滤前后结果的差距
+perl fq_summary.pl fastqc2
+# FAIL	Per base sequence content	4
+# FAIL	Sequence Duplication Levels	7
 ```
