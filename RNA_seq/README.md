@@ -98,6 +98,9 @@ top # top命令查看
 
 # fastqc运行完之后，统计结果中出现各个项目中出现fail的次数
 # yfchen@hnu2024 Tue Sep 16 11:51:43 ~/RNA_seq
+# vi编辑器创建perl脚本"fq_summary.pl"
+vi fq_summary.pl
+# 把fq_summary.pl脚本内容复制进去，然后运行
 perl fq_summary.pl fastqc1
 ```
 
@@ -117,6 +120,9 @@ cp ~/software/Trimmomatic-0.39/adapters/TruSeq2-PE.fa ./
 java -jar trimmomatic-0.39.jar PE DaruB10_R1.fq.gz DaruB10_R2.fq.gz Trimmomatic/paired/DaruB10_R1.paired.fq.gz Trimmomatic/unpaired/DaruB10_R1.unpaired.fq.gz Trimmomatic/paired/DaruB10_R2.paired.fq.gz Trimmomatic/unpaired/DaruB10_R2.unpaired.fq.gz ILLUMINACLIP:TruSeq2-PE.fa:2:30:10 LEADING:4 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:40 -threads 10
 
 # 一次性运行全部，nohup提交至后台运行，可用top查看
+# vi编辑器创建perl脚本"run_trimmo.pl"
+vi run_trimmo.pl
+# 把fq_summary.pl脚本内容复制进去，然后运行
 nohup perl run_trimmo.pl TruSeq2-PE.fa > run_trimmo.process 2>&1 &
 ```
 
